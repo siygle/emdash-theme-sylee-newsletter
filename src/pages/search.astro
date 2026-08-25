@@ -1,0 +1,19 @@
+---
+import LiveSearch from "emdash/ui/search";
+import NewsletterLayout from "../layouts/NewsletterLayout.astro";
+---
+
+<NewsletterLayout title="Search" description="Search newsletter issues">
+  <section class="newsletter-search-page">
+    <h1>Search</h1>
+    <p>Search posts and pages.</p>
+    <LiveSearch
+      placeholder="Search issues..."
+      collections={["posts", "pages"]}
+      class="newsletter-search"
+      inputClass="newsletter-search__input"
+      resultsClass="newsletter-search__results"
+      resultClass="newsletter-search__result"
+    />
+  </section>
+</NewsletterLayout>

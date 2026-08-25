@@ -1,0 +1,51 @@
+{
+  "name": "emdash-theme-sylee-newsletter",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "An EmDash newsletter theme inspired by sylee.dev/newsletter.",
+  "keywords": [
+    "astro-template",
+    "emdash",
+    "emdash-theme",
+    "newsletter",
+    "blog"
+  ],
+  "emdash": {
+    "label": "Sylee Newsletter",
+    "description": "A monochrome, issue-driven newsletter theme with large masthead typography and social embeds.",
+    "seed": ".emdash/seed.json",
+    "preview": "https://sylee.dev/newsletter/"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "astro build && wrangler deploy",
+    "typecheck": "astro check",
+    "bootstrap": "emdash init && emdash seed",
+    "seed": "emdash seed"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.2.4",
+    "@astrojs/react": "^6.0.4",
+    "@emdash-cms/cloudflare": "^0.35.0",
+    "astro": "^7.2.6",
+    "emdash": "^0.35.0",
+    "emdash-plugin-social-embeds": "github:siygle/emdash-plugin-social-embeds#v0.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20260825.1",
+    "wrangler": "^4.125.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
+  },
+  "license": "MIT"
+}

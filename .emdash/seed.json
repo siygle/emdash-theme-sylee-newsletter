@@ -1,0 +1,214 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "meta": {
+    "name": "Sylee Newsletter",
+    "description": "A monochrome, issue-driven newsletter theme inspired by sylee.dev/newsletter.",
+    "author": "Shih-Yung Lee"
+  },
+  "settings": {
+    "title": "網路黑手的呢喃",
+    "tagline": "關於科技、開源、網路世界的不定期電子報",
+    "postsPerPage": 7,
+    "dateFormat": "MMM d, yyyy"
+  },
+  "collections": [
+    {
+      "slug": "posts",
+      "label": "Issues",
+      "labelSingular": "Issue",
+      "description": "Newsletter issues rendered at /newsletter/[slug].",
+      "icon": "newspaper",
+      "supports": ["drafts", "revisions", "search"],
+      "fields": [
+        { "slug": "title", "label": "Title", "type": "string", "required": true },
+        { "slug": "featured_image", "label": "Featured Image", "type": "image" },
+        { "slug": "content", "label": "Content", "type": "portableText" },
+        { "slug": "excerpt", "label": "Excerpt", "type": "text" }
+      ]
+    },
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "description": "Standalone pages.",
+      "icon": "file-text",
+      "supports": ["drafts", "revisions", "search"],
+      "fields": [
+        { "slug": "title", "label": "Title", "type": "string", "required": true },
+        { "slug": "content", "label": "Content", "type": "portableText" }
+      ]
+    }
+  ],
+  "taxonomies": [
+    {
+      "name": "category",
+      "label": "Categories",
+      "labelSingular": "Category",
+      "hierarchical": true,
+      "collections": ["posts"],
+      "terms": [
+        { "slug": "newsletter", "label": "Newsletter" }
+      ]
+    },
+    {
+      "name": "tag",
+      "label": "Tags",
+      "labelSingular": "Tag",
+      "hierarchical": false,
+      "collections": ["posts"],
+      "terms": [
+        { "slug": "newsletter", "label": "Newsletter" },
+        { "slug": "cloudflare", "label": "Cloudflare" },
+        { "slug": "open-source", "label": "Open Source" },
+        { "slug": "ai", "label": "AI" }
+      ]
+    }
+  ],
+  "bylines": [
+    {
+      "id": "author",
+      "slug": "author",
+      "displayName": "Author",
+      "bio": "Newsletter author"
+    }
+  ],
+  "menus": [
+    {
+      "name": "primary",
+      "label": "Primary Navigation",
+      "items": [
+        { "type": "custom", "label": "Issues", "url": "/newsletter" },
+        { "type": "custom", "label": "Search", "url": "/search" },
+        { "type": "custom", "label": "RSS", "url": "/rss.xml" }
+      ]
+    }
+  ],
+  "content": {
+    "pages": [
+      {
+        "id": "about",
+        "slug": "about",
+        "status": "published",
+        "data": {
+          "title": "About",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                { "_type": "span", "text": "This theme is built for issue-driven writing: a big monochrome masthead, date-first archive rows, and clean long-form reading pages." }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "posts": [
+      {
+        "id": "issue-72",
+        "slug": "whispers-of-network-tinkerer-72",
+        "status": "published",
+        "data": {
+          "title": "網路黑手的呢喃 - #72",
+          "excerpt": "一個以科技、開源與網路文化為中心的 issue 範例。",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                { "_type": "span", "text": "這是一篇示範 issue。版面刻意保留大量空白、粗黑標題與簡潔的列表節奏，適合長期累積型 newsletter。" }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "children": [
+                { "_type": "span", "text": "新的工具與舊的習慣" }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                { "_type": "span", "text": "技術工具會一直變，但寫作真正需要的是穩定的節奏與可長期維護的內容模型。" }
+              ]
+            },
+            {
+              "_type": "embed",
+              "_key": "sample-youtube",
+              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "provider": "youtube",
+              "caption": "Sample YouTube embed"
+            }
+          ]
+        },
+        "bylines": [{ "byline": "author" }],
+        "taxonomies": {
+          "category": ["newsletter"],
+          "tag": ["newsletter", "ai"]
+        }
+      },
+      {
+        "id": "issue-71",
+        "slug": "whispers-of-network-tinkerer-71",
+        "status": "published",
+        "data": {
+          "title": "無人車的未來？ - #71",
+          "excerpt": "雖然自動駕駛在近年來已經不算是什麼神奇的功能，但要做到完整自動駕駛各家廠商都還在努力中。",
+          "content": [
+            {
+              "_type": "block",
+              "style": "h2",
+              "children": [
+                { "_type": "span", "text": "Cybercab 正夯" }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                { "_type": "span", "text": "這裡展示一個 X/Twitter socialEmbed block。實際內容匯入時，migration script 會把貼文網址轉成相同結構。" }
+              ]
+            },
+            {
+              "_type": "socialEmbed",
+              "_key": "sample-twitter",
+              "platform": "twitter",
+              "url": "https://x.com/JoeTegtmeyer/status/1861819915822371093",
+              "title": "X/Twitter post"
+            }
+          ]
+        },
+        "bylines": [{ "byline": "author" }],
+        "taxonomies": {
+          "category": ["newsletter"],
+          "tag": ["newsletter", "ai"]
+        }
+      },
+      {
+        "id": "issue-70",
+        "slug": "whispers-of-network-tinkerer-70",
+        "status": "published",
+        "data": {
+          "title": "最近湧出不少 AI 相關的想法 - #70",
+          "excerpt": "AI 相關工具與服務快速演進，值得用長期觀察的角度記錄下來。",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                { "_type": "span", "text": "這個 sample issue 用來展示 archive list 上的標題、摘要與 tag 呈現。" }
+              ]
+            }
+          ]
+        },
+        "bylines": [{ "byline": "author" }],
+        "taxonomies": {
+          "category": ["newsletter"],
+          "tag": ["newsletter", "open-source", "ai"]
+        }
+      }
+    ]
+  }
+}
