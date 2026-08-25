@@ -23,7 +23,6 @@ const prev = currentIndex > 0 ? sorted[currentIndex - 1] : null;
 const next = currentIndex >= 0 && currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : null;
 const issueNum = getIssueNumber(issue);
 const publishedAt = issue.data.publishedAt || issue.data.createdAt;
-const siteTitle = settings.title || "網路黑手的呢喃";
 const topTags = getTopTags(tags || [], 4);
 ---
 

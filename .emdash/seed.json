@@ -7,8 +7,8 @@
     "author": "Shih-Yung Lee"
   },
   "settings": {
-    "title": "網路黑手的呢喃",
-    "tagline": "關於科技、開源、網路世界的不定期電子報",
+    "title": "Newsletter Notes",
+    "tagline": "An independent newsletter about technology, craft, and the web.",
     "postsPerPage": 7,
     "dateFormat": "MMM d, yyyy"
   },
@@ -106,38 +106,38 @@
     ],
     "posts": [
       {
-        "id": "issue-72",
-        "slug": "whispers-of-network-tinkerer-72",
+        "id": "issue-003",
+        "slug": "issue-003",
         "status": "published",
         "data": {
-          "title": "網路黑手的呢喃 - #72",
-          "excerpt": "一個以科技、開源與網路文化為中心的 issue 範例。",
+          "title": "Designing a Durable Newsletter Template - #3",
+          "excerpt": "A sample issue that demonstrates the large masthead, bold dividers, and long-form reading rhythm of this theme.",
           "content": [
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "這是一篇示範 issue。版面刻意保留大量空白、粗黑標題與簡潔的列表節奏，適合長期累積型 newsletter。" }
+                { "_type": "span", "text": "This is fictional sample content included only to show how the newsletter layout behaves after a fresh EmDash seed import." }
               ]
             },
             {
               "_type": "block",
               "style": "h2",
               "children": [
-                { "_type": "span", "text": "新的工具與舊的習慣" }
+                { "_type": "span", "text": "A strong issue-driven archive" }
               ]
             },
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "技術工具會一直變，但寫作真正需要的是穩定的節奏與可長期維護的內容模型。" }
+                { "_type": "span", "text": "Each issue can include essays, links, notes, code snippets, and embedded media while keeping the page focused and readable." }
               ]
             },
             {
               "_type": "embed",
               "_key": "sample-youtube",
-              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+              "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
               "provider": "youtube",
               "caption": "Sample YouTube embed"
             }
@@ -146,59 +146,59 @@
         "bylines": [{ "byline": "author" }],
         "taxonomies": {
           "category": ["newsletter"],
-          "tag": ["newsletter", "ai"]
+          "tag": ["newsletter", "open-source"]
         }
       },
       {
-        "id": "issue-71",
-        "slug": "whispers-of-network-tinkerer-71",
+        "id": "issue-002",
+        "slug": "issue-002",
         "status": "published",
         "data": {
-          "title": "無人車的未來？ - #71",
-          "excerpt": "雖然自動駕駛在近年來已經不算是什麼神奇的功能，但要做到完整自動駕駛各家廠商都還在努力中。",
+          "title": "Notes from the Open Web - #2",
+          "excerpt": "A fictional issue for testing archive rows, tag pills, and social embed blocks without shipping personal blog content.",
           "content": [
             {
               "_type": "block",
               "style": "h2",
               "children": [
-                { "_type": "span", "text": "Cybercab 正夯" }
+                { "_type": "span", "text": "Portable Text blocks" }
               ]
             },
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "這裡展示一個 X/Twitter socialEmbed block。實際內容匯入時，migration script 會把貼文網址轉成相同結構。" }
+                { "_type": "span", "text": "The theme supports standard EmDash rich text blocks plus plugin-provided social embeds for services such as X/Twitter and Bluesky." }
               ]
             },
             {
               "_type": "socialEmbed",
               "_key": "sample-twitter",
               "platform": "twitter",
-              "url": "https://x.com/JoeTegtmeyer/status/1861819915822371093",
-              "title": "X/Twitter post"
+              "url": "https://x.com/example/status/1234567890",
+              "title": "Example social post"
             }
           ]
         },
         "bylines": [{ "byline": "author" }],
         "taxonomies": {
           "category": ["newsletter"],
-          "tag": ["newsletter", "ai"]
+          "tag": ["newsletter", "cloudflare"]
         }
       },
       {
-        "id": "issue-70",
-        "slug": "whispers-of-network-tinkerer-70",
+        "id": "issue-001",
+        "slug": "issue-001",
         "status": "published",
         "data": {
-          "title": "最近湧出不少 AI 相關的想法 - #70",
-          "excerpt": "AI 相關工具與服務快速演進，值得用長期觀察的角度記錄下來。",
+          "title": "Starting the Newsletter - #1",
+          "excerpt": "A neutral starter issue that shows how a freshly seeded site looks before authors replace the demo content.",
           "content": [
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "這個 sample issue 用來展示 archive list 上的標題、摘要與 tag 呈現。" }
+                { "_type": "span", "text": "Replace this fictional starter issue with your own first newsletter entry after installing the theme." }
               ]
             }
           ]
@@ -206,7 +206,7 @@
         "bylines": [{ "byline": "author" }],
         "taxonomies": {
           "category": ["newsletter"],
-          "tag": ["newsletter", "open-source", "ai"]
+          "tag": ["newsletter", "ai"]
         }
       }
     ]

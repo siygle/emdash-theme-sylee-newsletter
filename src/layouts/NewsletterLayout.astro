@@ -23,8 +23,8 @@ const {
 } = Astro.props;
 
 const settings = await getSiteSettings();
-const siteTitle = settings.title || "網路黑手的呢喃";
-const siteTagline = settings.tagline || "關於科技、開源、網路世界的不定期電子報";
+const siteTitle = settings.title || "Newsletter Notes";
+const siteTagline = settings.tagline || "An independent newsletter about technology, craft, and the web.";
 const fullTitle = title && title !== siteTitle ? `${title} - ${siteTitle}` : siteTitle;
 const menu = await getMenu("primary");
 const pageCtx = createPublicPageContext({

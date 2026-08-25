@@ -6,8 +6,8 @@ export async function GET({ site }: { site?: URL }) {
     getSiteSettings()
   ]);
   const base = site?.toString().replace(/\/$/, "") || "";
-  const title = settings.title || "網路黑手的呢喃";
-  const description = settings.tagline || "關於科技、開源、網路世界的不定期電子報";
+  const title = settings.title || "Newsletter Notes";
+  const description = settings.tagline || "An independent newsletter about technology, craft, and the web.";
   const items = entries.map((entry: any) => `
     <item>
       <title><![CDATA[${entry.data.title || entry.id}]]></title>
