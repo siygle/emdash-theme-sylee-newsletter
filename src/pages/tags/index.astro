@@ -1,0 +1,56 @@
+---
+import { getTaxonomyTerms, getEmDashCollection, getTermsForEntries, type TaxonomyTerm } from "emdash";
+import SyleeLayout from "../../layouts/SyleeLayout.astro";
+
+const [terms, { entries: posts, cacheHint }] = await Promise.all([
+	getTaxonomyTerms("tag"),
+	getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 500 }),
+]);
+Astro.cache.set(cacheHint);
+
+const tagsByEntry = await getTermsForEntries(
+	"posts",
+	posts.map((post) => post.data.id),
+	"tag",
+);
+const counts = new Map<string, number>();
+for (const postTags of tagsByEntry.values()) {
+	for (const tag of postTags) counts.set(tag.slug, (counts.get(tag.slug) ?? 0) + 1);
+}
+type TagWithCount = TaxonomyTerm & { count: number };
+const tags: TagWithCount[] = (terms ?? [])
+	.map((tag: TaxonomyTerm) => ({ ...tag, count: counts.get(tag.slug) ?? 0 }))
+	.filter((tag: TagWithCount) => tag.count > 0)
+	.sort((a: TagWithCount, b: TagWithCount) => b.count - a.count || a.label.localeCompare(b.label));
+---
+
+<SyleeLayout title="Tags - Sy Lee" description="Browse posts by tag">
+	<div class="sylee-tags-page">
+		<h1 class="sylee-tags-title reveal">Tags</h1>
+		<div class="sylee-tags-cloud reveal reveal-delay-1">
+			{tags.map((tag) => {
+				const sizeClass = tag.count >= 6 ? "is-large" : tag.count >= 3 ? "is-medium" : "is-small";
+				return (
+					<a href={`/tags/${tag.slug}`} class={`sylee-tag ${sizeClass}`}>
+						{tag.label}
+						<span>({tag.count})</span>
+					</a>
+				);
+			})}
+		</div>
+	</div>
+</SyleeLayout>
+
+
+<script>
+	function initRevealObserver() {
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) entry.target.classList.add("visible");
+			});
+		}, { threshold: 0.1, rootMargin: "-20px" });
+		document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+	}
+	initRevealObserver();
+	document.addEventListener("astro:after-swap", initRevealObserver);
+</script>

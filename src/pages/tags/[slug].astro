@@ -1,0 +1,64 @@
+---
+import { getTerm, getEmDashCollection, decodeSlug } from "emdash";
+import SyleeLayout from "../../layouts/SyleeLayout.astro";
+
+const slug = decodeSlug(Astro.params.slug);
+const term = slug ? await getTerm("tag", slug) : null;
+
+if (!term) {
+	return Astro.redirect("/404");
+}
+
+const { entries: posts, cacheHint } = await getEmDashCollection("posts", {
+	where: { tag: term.slug },
+	orderBy: { published_at: "desc" },
+});
+Astro.cache.set(cacheHint);
+
+function formatDate(date: Date | null | undefined): string {
+	if (!date) return "";
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+}
+---
+
+<SyleeLayout title={`${term.label} - Tags - Sy Lee`} description={`Posts tagged with ${term.label}`}>
+	<div class="sylee-tag-page">
+		<div class="sylee-tag-header reveal">
+			<a href="/tags" class="sylee-back">← All Tags</a>
+			<h1>
+				<span>{term.label}</span>
+				<span class="sylee-tag-count">({posts.length} {posts.length === 1 ? "post" : "posts"})</span>
+			</h1>
+		</div>
+
+		<div class="sylee-tag-posts">
+			{posts.map((post, index) => (
+				<article class="sylee-tag-post reveal" style={`transition-delay: ${Math.min(index * 50, 300)}ms`}>
+					<a href={`/blog/${post.id}`}>
+						<time>{formatDate(post.data.publishedAt)}</time>
+						<h2>{post.data.title}</h2>
+						{post.data.excerpt && <p>{post.data.excerpt}</p>}
+					</a>
+				</article>
+			))}
+		</div>
+	</div>
+</SyleeLayout>
+
+
+<script>
+	function initRevealObserver() {
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) entry.target.classList.add("visible");
+			});
+		}, { threshold: 0.1, rootMargin: "-20px" });
+		document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+	}
+	initRevealObserver();
+	document.addEventListener("astro:after-swap", initRevealObserver);
+</script>

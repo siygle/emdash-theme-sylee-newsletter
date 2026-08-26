@@ -1,4 +1,4 @@
-import { extractPlainText } from "emdash";
+import { extractPlainText, type PortableTextBlock } from "emdash";
 
 export function getIssueNumber(entry: { id?: string; slug?: string; data?: { title?: string } }): string {
   const raw = entry.slug || entry.id || entry.data?.title || "";
@@ -37,7 +37,7 @@ export function getTopTags(tags: Array<{ label?: string; slug?: string }>, max =
     .slice(0, max);
 }
 
-export function getReadingTime(blocks: unknown[] | undefined): number {
+export function getReadingTime(blocks: PortableTextBlock[] | undefined): number {
   const text = extractPlainText(blocks || []);
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 220));

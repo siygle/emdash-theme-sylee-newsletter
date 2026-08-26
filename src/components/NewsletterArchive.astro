@@ -15,7 +15,7 @@ const settings = await getSiteSettings();
 const siteTitle = settings.title || "Newsletter Notes";
 const siteTagline = settings.tagline || "An independent newsletter about technology, craft, and the web.";
 
-const { entries, hasMore, cacheHint } = await getEmDashCollection("posts", {
+const { entries, hasMore, cacheHint } = await getEmDashCollection("newsletter", {
   orderBy: { published_at: "desc" },
   offset: (pageNumber - 1) * PAGE_SIZE,
   limit: PAGE_SIZE + 1
@@ -26,7 +26,7 @@ const visible = entries.slice(0, PAGE_SIZE);
 const featured = isFirstPage ? visible[0] : null;
 const listItems = isFirstPage ? visible.slice(1) : visible;
 const tagIds = visible.map((entry: any) => entry.data.id).filter(Boolean);
-const tagsByEntry = tagIds.length ? await getTermsForEntries("posts", tagIds, "tag") : new Map();
+const tagsByEntry = tagIds.length ? await getTermsForEntries("newsletter", tagIds, "tag") : new Map();
 const featuredTags = featured ? getTopTags(tagsByEntry.get(featured.data.id) || [], 3) : [];
 
 function pageUrl(num: number) {
@@ -39,7 +39,7 @@ function pageUrl(num: number) {
     <section class="newsletter-empty">
       <h1>No issues yet</h1>
       <p>Create your first post in the EmDash admin.</p>
-      <a href="/_emdash/admin/content/posts/new">Create Issue</a>
+      <a href="/_emdash/admin/content/newsletter/new">Create Issue</a>
     </section>
   ) : (
     <>

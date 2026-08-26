@@ -1,19 +1,68 @@
 ---
-import LiveSearch from "emdash/ui/search";
-import NewsletterLayout from "../layouts/NewsletterLayout.astro";
+export const prerender = false;
+
+import { search } from "emdash";
+import SyleeLayout from "../layouts/SyleeLayout.astro";
+
+const query = Astro.url.searchParams.get("q")?.trim() || "";
+const { items: results } = query
+  ? await search(query, { collections: ["posts", "newsletter", "pages"], limit: 30 })
+  : { items: [] };
+
+function hrefFor(result: { collection?: string; type?: string; slug?: string | null; id: string }) {
+  const collection = result.collection || result.type;
+  const slug = result.slug ?? result.id;
+  if (collection === "newsletter") return `/newsletter/${slug}`;
+  if (collection === "pages") return `/pages/${slug}`;
+  return `/blog/${slug}`;
+}
 ---
 
-<NewsletterLayout title="Search" description="Search newsletter issues">
-  <section class="newsletter-search-page">
-    <h1>Search</h1>
-    <p>Search posts and pages.</p>
-    <LiveSearch
-      placeholder="Search issues..."
-      collections={["posts", "pages"]}
-      class="newsletter-search"
-      inputClass="newsletter-search__input"
-      resultsClass="newsletter-search__results"
-      resultClass="newsletter-search__result"
-    />
+<SyleeLayout title={query ? `Search: ${query}` : "Search"} description="Search posts and newsletter issues">
+  <section class="sylee-container">
+    <h1 class="sylee-page-title reveal">Search</h1>
+    <form method="get" action="/search" class="sylee-search-form reveal reveal-delay-1">
+      <input
+        type="search"
+        name="q"
+        value={query}
+        placeholder="Search posts..."
+        class="sylee-search-input"
+        autofocus
+      />
+      <button type="submit" class="sylee-search-button">Search</button>
+    </form>
+
+    {query && (
+      <p class="sylee-search-summary reveal reveal-delay-2">
+        {results.length === 0 ? `No results for "${query}"` : `${results.length} result${results.length === 1 ? "" : "s"} for "${query}"`}
+      </p>
+    )}
+
+    {results.length > 0 ? (
+      <ol class="sylee-search-results">
+        {results.map((result) => (
+          <li class="sylee-search-result reveal">
+            <a href={hrefFor(result)}>
+              <h2>{result.title ?? "Untitled"}</h2>
+              {result.snippet && <p set:html={result.snippet} />}
+            </a>
+          </li>
+        ))}
+      </ol>
+    ) : !query ? (
+      <p class="sylee-page-desc reveal reveal-delay-2">Enter a search term to find posts.</p>
+    ) : null}
   </section>
-</NewsletterLayout>
+
+  <script>
+    function initRevealObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
+      }, { threshold: 0.1, rootMargin: "-20px" });
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    }
+    initRevealObserver();
+    document.addEventListener("astro:after-swap", initRevealObserver);
+  </script>
+</SyleeLayout>

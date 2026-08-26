@@ -1,3 +1,218 @@
 ---
-return Astro.redirect("/newsletter");
+import { getEmDashCollection, getTermsForEntries } from "emdash";
+import SyleeLayout from "../layouts/SyleeLayout.astro";
+import SocialLinks from "../components/SocialLinks.astro";
+
+const POSTS_PER_PAGE = 5;
+
+const { entries: allPosts, cacheHint } = await getEmDashCollection("posts", {
+	orderBy: { published_at: "desc" },
+	limit: 200,
+});
+
+Astro.cache.set(cacheHint);
+const latestPosts = allPosts.slice(0, POSTS_PER_PAGE);
+const latestTagIds = latestPosts.map((p) => p.data.id);
+const tagsByEntry = await getTermsForEntries("posts", latestTagIds, "tag");
+
+function formatDate(date: Date | null | undefined): string {
+	if (!date) return "";
+	return date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+}
 ---
+
+<SyleeLayout
+	title="Sy Lee - Software Engineer"
+	description="Personal website of a software engineer from Taiwan who is passionate about web development"
+>
+	<div class="sylee-home-page">
+		<section class="sylee-hero">
+			<div class="sylee-hero-inner">
+				<img
+					src="/avatar.jpg"
+					alt="Avatar"
+					class="sylee-avatar reveal"
+				/>
+				<h1 class="sylee-title reveal reveal-delay-1">
+					My Style, My way, My blog
+				</h1>
+				<p class="sylee-intro reveal reveal-delay-2">
+					I'm <span>SY</span>, a software engineer from Taiwan who is passionate about web development. I love writing code and staying up-to-date with the <a href="https://chat.sylee.dev/">latest web trends</a>.
+				</p>
+				<div class="reveal reveal-delay-3">
+					<SocialLinks />
+				</div>
+			</div>
+		</section>
+
+		<section class="sylee-latest">
+			<h2 class="sylee-section-title reveal">Latest Posts</h2>
+			<div id="posts-list" class="sylee-posts-list">
+				{latestPosts.map((post, index) => {
+					const tags = tagsByEntry.get(post.data.id) ?? [];
+					return (
+						<article class={`sylee-post-item reveal reveal-delay-${Math.min(index + 1, 4)}`}>
+							<a href={`/blog/${post.id}`} class="sylee-post-link">
+								<div class="sylee-post-mainline">
+									<h3>{post.data.title}</h3>
+									<time>{formatDate(post.data.publishedAt)}</time>
+								</div>
+							</a>
+							{tags.length > 0 && (
+								<div class="sylee-post-tags">
+									{tags.map((tag) => (
+										<a href={`/tags/${tag.slug}`}>{tag.label}</a>
+									))}
+								</div>
+							)}
+						</article>
+					);
+				})}
+			</div>
+
+			<nav id="posts-pagination" class="sylee-pagination reveal reveal-delay-4">
+				<button id="prev-page-btn" type="button" class="sylee-page-btn is-disabled" disabled>
+					← Previous
+				</button>
+				<span id="page-indicator" class="sylee-page-indicator">Page 1</span>
+				<button id="next-page-btn" type="button" class="sylee-page-btn">
+					Next →
+				</button>
+			</nav>
+			<div class="sylee-view-all reveal reveal-delay-4">
+				<a href="/blog">View all posts →</a>
+			</div>
+		</section>
+	</div>
+
+	<script>
+		function initLandingPagination() {
+			const list = document.getElementById("posts-list");
+			const prevButton = document.getElementById("prev-page-btn") as HTMLButtonElement | null;
+			const nextButton = document.getElementById("next-page-btn") as HTMLButtonElement | null;
+			const pageIndicator = document.getElementById("page-indicator");
+			if (!list || !prevButton || !nextButton || !pageIndicator || list.dataset.ready === "true") return;
+			const postsList: HTMLElement = list;
+			const prevBtn: HTMLButtonElement = prevButton;
+			const nextBtn: HTMLButtonElement = nextButton;
+			const indicator: HTMLElement = pageIndicator;
+			postsList.dataset.ready = "true";
+
+			let currentPage = 1;
+			let totalPages = 1;
+			let loading = false;
+
+			function formatDate(dateString: string): string {
+				const date = new Date(dateString);
+				return date.toLocaleDateString("en-US", {
+					year: "numeric",
+					month: "short",
+					day: "numeric",
+				});
+			}
+
+			function escapeHtml(str: string): string {
+				const div = document.createElement("div");
+				div.textContent = str;
+				return div.innerHTML;
+			}
+
+			function setButtonState(button: HTMLButtonElement, enabled: boolean) {
+				button.disabled = !enabled;
+				button.classList.toggle("is-disabled", !enabled);
+			}
+
+			function updateButtons() {
+				setButtonState(prevBtn, currentPage > 1);
+				setButtonState(nextBtn, currentPage < totalPages);
+				indicator.textContent = `Page ${currentPage} of ${totalPages}`;
+			}
+
+			function renderPosts(posts: Array<{ slug: string; title: string; date: string; tags: Array<{ name: string; slug: string }> }>) {
+				postsList.innerHTML = "";
+				for (const post of posts) {
+					const article = document.createElement("article");
+					article.className = "sylee-post-item";
+					const tagsHtml = post.tags.length > 0
+						? `<div class="sylee-post-tags">${post.tags.map((t) => `<a href="/tags/${escapeHtml(t.slug)}">${escapeHtml(t.name)}</a>`).join("")}</div>`
+						: "";
+					article.innerHTML = `
+						<a href="/blog/${escapeHtml(post.slug)}" class="sylee-post-link">
+							<div class="sylee-post-mainline">
+								<h3>${escapeHtml(post.title)}</h3>
+								<time>${formatDate(post.date)}</time>
+							</div>
+						</a>
+						${tagsHtml}
+					`;
+					postsList.appendChild(article);
+				}
+			}
+
+			async function goToPage(page: number) {
+				if (loading) return;
+				loading = true;
+				postsList.style.transition = "opacity 150ms ease-out, transform 150ms ease-out";
+				postsList.style.opacity = "0";
+				postsList.style.transform = "translateY(8px)";
+				try {
+					const res = await fetch(`/api/posts?page=${page}&limit=5`);
+					const data = await res.json() as { page: number; totalPages: number; posts: Array<{ slug: string; title: string; date: string; tags: Array<{ name: string; slug: string }> }> };
+					currentPage = data.page;
+					totalPages = data.totalPages;
+					await new Promise((r) => setTimeout(r, 150));
+					renderPosts(data.posts);
+					updateButtons();
+					postsList.style.transition = "opacity 300ms ease-out, transform 300ms ease-out";
+					postsList.style.opacity = "1";
+					postsList.style.transform = "translateY(0)";
+					postsList.scrollIntoView({ behavior: "smooth", block: "start" });
+				} catch {
+					postsList.style.opacity = "1";
+					postsList.style.transform = "translateY(0)";
+				} finally {
+					loading = false;
+				}
+			}
+
+			fetch("/api/posts?page=1&limit=5")
+				.then((res) => res.json() as Promise<{ totalPages: number }>)
+				.then((data) => {
+					totalPages = data.totalPages;
+					updateButtons();
+				})
+				.catch(() => {});
+
+			prevBtn.addEventListener("click", () => {
+				if (currentPage > 1) goToPage(currentPage - 1);
+			});
+			nextBtn.addEventListener("click", () => {
+				if (currentPage < totalPages) goToPage(currentPage + 1);
+			});
+		}
+
+		function initRevealObserver() {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) entry.target.classList.add("visible");
+					});
+				},
+				{ threshold: 0.1, rootMargin: "-20px" },
+			);
+			document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+		}
+
+		initLandingPagination();
+		initRevealObserver();
+		document.addEventListener("astro:after-swap", () => {
+			initLandingPagination();
+			initRevealObserver();
+		});
+	</script>
+</SyleeLayout>
+
