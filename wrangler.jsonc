@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "emdash-theme-sylee-newsletter",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "emdash-theme-sylee-newsletter",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "emdash-theme-sylee-newsletter-media",
+      "preview_bucket_name": "emdash-theme-sylee-newsletter-media"
+    }
+  ],
+  "worker_loaders": [
+    { "binding": "LOADER" }
+  ]
+}
