@@ -1,0 +1,115 @@
+---
+import SyleeLayout from "../layouts/SyleeLayout.astro";
+import BlueskyPost from "../components/bluesky/BlueskyPost.astro";
+import BlueskyThread from "../components/bluesky/BlueskyThread.astro";
+import { getFeedWithThreads, type ProcessedFeedItem } from "../lib/bluesky";
+
+export const prerender = false;
+
+const BLUESKY_HANDLE = import.meta.env.PUBLIC_BLUESKY_HANDLE || "sylee.dev";
+const POST_LIMIT = parseInt(import.meta.env.BLUESKY_POST_LIMIT || "7", 10);
+
+const feedData = await getFeedWithThreads(BLUESKY_HANDLE, POST_LIMIT);
+
+function getWeekLabel(dateString: string): string {
+	const date = new Date(dateString);
+	const now = new Date();
+	const startOfThisWeek = new Date(now);
+	startOfThisWeek.setHours(0, 0, 0, 0);
+	startOfThisWeek.setDate(now.getDate() - now.getDay());
+	const startOfLastWeek = new Date(startOfThisWeek);
+	startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+
+	if (date >= startOfThisWeek) return "This Week";
+	if (date >= startOfLastWeek) return "Last Week";
+	const weekStart = new Date(date);
+	weekStart.setDate(date.getDate() - date.getDay());
+	return `Week of ${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+}
+
+function getItemDate(item: ProcessedFeedItem): string {
+	if (item.isThread && item.threadPosts && item.threadPosts.length > 0) {
+		return item.threadPosts[item.threadPosts.length - 1].record.createdAt;
+	}
+	return item.post.record.createdAt;
+}
+
+type WeekGroup = { label: string; items: ProcessedFeedItem[] };
+const weekGroups: WeekGroup[] = [];
+
+if (!feedData.error && feedData.items.length > 0) {
+	let currentLabel = "";
+	let currentGroup: ProcessedFeedItem[] = [];
+	for (const item of feedData.items) {
+		const label = getWeekLabel(getItemDate(item));
+		if (label !== currentLabel) {
+			if (currentGroup.length > 0) weekGroups.push({ label: currentLabel, items: currentGroup });
+			currentLabel = label;
+			currentGroup = [item];
+		} else {
+			currentGroup.push(item);
+		}
+	}
+	if (currentGroup.length > 0) weekGroups.push({ label: currentLabel, items: currentGroup });
+}
+---
+
+<SyleeLayout title="Murmur - Sy Lee" description="My thoughts and musings from Bluesky">
+	<div class="sylee-container">
+		<header class="sylee-murmur-header reveal">
+			<h1>Murmur</h1>
+			<p>
+				Thoughts from
+				<a href={`https://bsky.app/profile/${BLUESKY_HANDLE}`} target="_blank" rel="noopener noreferrer">
+					@{BLUESKY_HANDLE}
+				</a>
+				on Bluesky
+			</p>
+		</header>
+
+		{feedData.error ? (
+			<div class="sylee-error">
+				<p><strong>Unable to load posts</strong></p>
+				<p>{feedData.error}</p>
+				<a href={`https://bsky.app/profile/${BLUESKY_HANDLE}`} target="_blank" rel="noopener noreferrer">
+					View on Bluesky instead
+				</a>
+			</div>
+		) : weekGroups.length === 0 ? (
+			<p>No posts yet.</p>
+		) : (
+			<div class="sylee-murmur-groups">
+				{weekGroups.map((group, groupIndex) => (
+					<section class="sylee-murmur-group reveal" style={`transition-delay: ${groupIndex * 100}ms`}>
+						<h2>{group.label}</h2>
+						<div class="sylee-murmur-items">
+							{group.items.map((item) =>
+								item.isThread && item.threadPosts ? (
+									<BlueskyThread posts={item.threadPosts} showDate={true} />
+								) : (
+									<BlueskyPost post={item.post} showDate={true} />
+								),
+							)}
+						</div>
+					</section>
+				))}
+			</div>
+		)}
+
+		<footer class="sylee-murmur-footer">
+			<a href={`https://bsky.app/profile/${BLUESKY_HANDLE}`} target="_blank" rel="noopener noreferrer">
+				Follow @{BLUESKY_HANDLE} on Bluesky
+			</a>
+		</footer>
+	</div>
+		<script>
+			function initRevealObserver() {
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
+				}, { threshold: 0.1, rootMargin: "-20px" });
+				document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+			}
+			initRevealObserver();
+			document.addEventListener("astro:after-swap", initRevealObserver);
+		</script>
+</SyleeLayout>

@@ -1,0 +1,99 @@
+---
+import { getEmDashCollection } from "emdash";
+import SyleeLayout from "../../layouts/SyleeLayout.astro";
+
+const { entries: posts, cacheHint } = await getEmDashCollection("posts", {
+  orderBy: { published_at: "desc" },
+  limit: 500,
+});
+Astro.cache.set(cacheHint);
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+type PostEntry = (typeof posts)[number];
+interface MonthGroup { month: number; monthName: string; posts: PostEntry[]; }
+interface YearGroup { year: number; postCount: number; months: MonthGroup[]; }
+
+const yearMap = new Map<number, Map<number, PostEntry[]>>();
+for (const post of posts) {
+  const date = post.data.publishedAt ?? post.data.createdAt;
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  if (!yearMap.has(year)) yearMap.set(year, new Map());
+  const monthMap = yearMap.get(year)!;
+  if (!monthMap.has(month)) monthMap.set(month, []);
+  monthMap.get(month)!.push(post);
+}
+
+const groupedPosts: YearGroup[] = Array.from(yearMap.entries())
+  .sort(([a], [b]) => b - a)
+  .map(([year, monthMap]) => {
+    const months = Array.from(monthMap.entries())
+      .sort(([a], [b]) => b - a)
+      .map(([month, posts]) => ({ month, monthName: MONTH_NAMES[month], posts }));
+    return { year, postCount: months.reduce((sum, m) => sum + m.posts.length, 0), months };
+  });
+
+function formatShortDate(date: Date | null | undefined) {
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+---
+
+<SyleeLayout title="Blog - Sy Lee" description="Blog posts about web development and technology">
+  <div class="sylee-container">
+    <h1 class="sylee-blog-title reveal">Blog</h1>
+    <p class="sylee-page-desc reveal">{posts.length} posts in the archive</p>
+
+    {groupedPosts.length === 0 ? (
+      <p>No posts yet.</p>
+    ) : (
+      <div class="sylee-year-groups">
+        {groupedPosts.map((yearGroup) => (
+          <section class="reveal">
+            <div class="sylee-year-head">
+              <h2>{yearGroup.year}</h2>
+              <span>{yearGroup.postCount} {yearGroup.postCount === 1 ? "post" : "posts"}</span>
+            </div>
+            <div class="sylee-months">
+              {yearGroup.months.map((monthGroup) => (
+                <div class="sylee-month">
+                  <h3>{monthGroup.monthName}</h3>
+                  <div class="sylee-month-posts">
+                    {monthGroup.posts.map((post) => (
+                      <article class="sylee-archive-post">
+                        <a href={`/blog/${post.id}`}>
+                          <div class="sylee-archive-line">
+                            <time>{formatShortDate(post.data.publishedAt)}</time>
+                            <div>
+                              <h4>{post.data.title}</h4>
+                              {post.data.excerpt && <p>{post.data.excerpt}</p>}
+                            </div>
+                          </div>
+                        </a>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <script>
+    function initRevealObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("visible"); });
+      }, { threshold: 0.1, rootMargin: "-20px" });
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    }
+    initRevealObserver();
+    document.addEventListener("astro:after-swap", initRevealObserver);
+  </script>
+</SyleeLayout>

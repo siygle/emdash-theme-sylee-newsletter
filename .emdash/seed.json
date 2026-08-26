@@ -3,28 +3,84 @@
   "version": "1",
   "meta": {
     "name": "Sylee Newsletter",
-    "description": "A monochrome, issue-driven newsletter theme inspired by sylee.dev/newsletter.",
+    "description": "A sylee.dev-inspired EmDash theme with blog, Murmur, tags, search, newsletter, and social embeds.",
     "author": "Shih-Yung Lee"
   },
   "settings": {
-    "title": "Newsletter Notes",
-    "tagline": "An independent newsletter about technology, craft, and the web.",
+    "title": "Sy Lee",
+    "tagline": "Personal website of a software engineer from Taiwan who is passionate about web development",
     "postsPerPage": 7,
     "dateFormat": "MMM d, yyyy"
   },
   "collections": [
     {
       "slug": "posts",
-      "label": "Issues",
+      "label": "Posts",
+      "labelSingular": "Post",
+      "description": "Blog posts rendered at /blog/[slug].",
+      "icon": "file-text",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "featured_image",
+          "label": "Featured Image",
+          "type": "image"
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText"
+        },
+        {
+          "slug": "excerpt",
+          "label": "Excerpt",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "slug": "newsletter",
+      "label": "Newsletter",
       "labelSingular": "Issue",
       "description": "Newsletter issues rendered at /newsletter/[slug].",
       "icon": "newspaper",
-      "supports": ["drafts", "revisions", "search"],
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
       "fields": [
-        { "slug": "title", "label": "Title", "type": "string", "required": true },
-        { "slug": "featured_image", "label": "Featured Image", "type": "image" },
-        { "slug": "content", "label": "Content", "type": "portableText" },
-        { "slug": "excerpt", "label": "Excerpt", "type": "text" }
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "featured_image",
+          "label": "Featured Image",
+          "type": "image"
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText"
+        },
+        {
+          "slug": "excerpt",
+          "label": "Excerpt",
+          "type": "text"
+        }
       ]
     },
     {
@@ -33,10 +89,23 @@
       "labelSingular": "Page",
       "description": "Standalone pages.",
       "icon": "file-text",
-      "supports": ["drafts", "revisions", "search"],
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
       "fields": [
-        { "slug": "title", "label": "Title", "type": "string", "required": true },
-        { "slug": "content", "label": "Content", "type": "portableText" }
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText"
+        }
       ]
     }
   ],
@@ -46,9 +115,15 @@
       "label": "Categories",
       "labelSingular": "Category",
       "hierarchical": true,
-      "collections": ["posts"],
+      "collections": [
+        "posts",
+        "newsletter"
+      ],
       "terms": [
-        { "slug": "newsletter", "label": "Newsletter" }
+        {
+          "slug": "newsletter",
+          "label": "Newsletter"
+        }
       ]
     },
     {
@@ -56,12 +131,27 @@
       "label": "Tags",
       "labelSingular": "Tag",
       "hierarchical": false,
-      "collections": ["posts"],
+      "collections": [
+        "posts",
+        "newsletter"
+      ],
       "terms": [
-        { "slug": "newsletter", "label": "Newsletter" },
-        { "slug": "cloudflare", "label": "Cloudflare" },
-        { "slug": "open-source", "label": "Open Source" },
-        { "slug": "ai", "label": "AI" }
+        {
+          "slug": "newsletter",
+          "label": "Newsletter"
+        },
+        {
+          "slug": "cloudflare",
+          "label": "Cloudflare"
+        },
+        {
+          "slug": "open-source",
+          "label": "Open Source"
+        },
+        {
+          "slug": "ai",
+          "label": "AI"
+        }
       ]
     }
   ],
@@ -78,9 +168,31 @@
       "name": "primary",
       "label": "Primary Navigation",
       "items": [
-        { "type": "custom", "label": "Issues", "url": "/newsletter" },
-        { "type": "custom", "label": "Search", "url": "/search" },
-        { "type": "custom", "label": "RSS", "url": "/rss.xml" }
+        {
+          "type": "custom",
+          "label": "Blog",
+          "url": "/blog"
+        },
+        {
+          "type": "custom",
+          "label": "Murmur",
+          "url": "/murmur"
+        },
+        {
+          "type": "custom",
+          "label": "Tags",
+          "url": "/tags"
+        },
+        {
+          "type": "custom",
+          "label": "Newsletter",
+          "url": "/newsletter"
+        },
+        {
+          "type": "custom",
+          "label": "Search",
+          "url": "/search"
+        }
       ]
     }
   ],
@@ -97,7 +209,10 @@
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "This theme is built for issue-driven writing: a big monochrome masthead, date-first archive rows, and clean long-form reading pages." }
+                {
+                  "_type": "span",
+                  "text": "This theme is built for issue-driven writing: a big monochrome masthead, date-first archive rows, and clean long-form reading pages."
+                }
               ]
             }
           ]
@@ -105,6 +220,91 @@
       }
     ],
     "posts": [
+      {
+        "id": "building-small-web-tools",
+        "slug": "building-small-web-tools",
+        "status": "published",
+        "data": {
+          "title": "Building Small Web Tools",
+          "excerpt": "A fictional sample post for testing the blog archive, article page, tags, and search layout.",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "text": "This neutral sample post demonstrates the blog layout without including any real personal content."
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "h2",
+              "children": [
+                {
+                  "_type": "span",
+                  "text": "Keep the layout focused"
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "text": "The theme is designed for a compact personal blog: readable typography, simple metadata, and lightweight navigation."
+                }
+              ]
+            }
+          ]
+        },
+        "bylines": [
+          {
+            "byline": "author"
+          }
+        ],
+        "taxonomies": {
+          "tag": [
+            "open-source"
+          ]
+        }
+      },
+      {
+        "id": "notes-on-the-open-web",
+        "slug": "notes-on-the-open-web",
+        "status": "published",
+        "data": {
+          "title": "Notes on the Open Web",
+          "excerpt": "A second fictional sample entry showing tag clouds and chronological archives.",
+          "content": [
+            {
+              "_type": "block",
+              "style": "normal",
+              "children": [
+                {
+                  "_type": "span",
+                  "text": "Use this sample entry to verify spacing, links, and archive grouping after seeding a new site."
+                }
+              ]
+            }
+          ]
+        },
+        "bylines": [
+          {
+            "byline": "author"
+          }
+        ],
+        "taxonomies": {
+          "tag": [
+            "cloudflare",
+            "ai"
+          ]
+        }
+      }
+    ],
+    "newsletter": [
       {
         "id": "issue-003",
         "slug": "issue-003",
@@ -117,21 +317,30 @@
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "This is fictional sample content included only to show how the newsletter layout behaves after a fresh EmDash seed import." }
+                {
+                  "_type": "span",
+                  "text": "This is fictional sample content included only to show how the newsletter layout behaves after a fresh EmDash seed import."
+                }
               ]
             },
             {
               "_type": "block",
               "style": "h2",
               "children": [
-                { "_type": "span", "text": "A strong issue-driven archive" }
+                {
+                  "_type": "span",
+                  "text": "A strong issue-driven archive"
+                }
               ]
             },
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "Each issue can include essays, links, notes, code snippets, and embedded media while keeping the page focused and readable." }
+                {
+                  "_type": "span",
+                  "text": "Each issue can include essays, links, notes, code snippets, and embedded media while keeping the page focused and readable."
+                }
               ]
             },
             {
@@ -143,10 +352,19 @@
             }
           ]
         },
-        "bylines": [{ "byline": "author" }],
+        "bylines": [
+          {
+            "byline": "author"
+          }
+        ],
         "taxonomies": {
-          "category": ["newsletter"],
-          "tag": ["newsletter", "open-source"]
+          "category": [
+            "newsletter"
+          ],
+          "tag": [
+            "newsletter",
+            "open-source"
+          ]
         }
       },
       {
@@ -161,14 +379,20 @@
               "_type": "block",
               "style": "h2",
               "children": [
-                { "_type": "span", "text": "Portable Text blocks" }
+                {
+                  "_type": "span",
+                  "text": "Portable Text blocks"
+                }
               ]
             },
             {
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "The theme supports standard EmDash rich text blocks plus plugin-provided social embeds for services such as X/Twitter and Bluesky." }
+                {
+                  "_type": "span",
+                  "text": "The theme supports standard EmDash rich text blocks plus plugin-provided social embeds for services such as X/Twitter and Bluesky."
+                }
               ]
             },
             {
@@ -180,10 +404,19 @@
             }
           ]
         },
-        "bylines": [{ "byline": "author" }],
+        "bylines": [
+          {
+            "byline": "author"
+          }
+        ],
         "taxonomies": {
-          "category": ["newsletter"],
-          "tag": ["newsletter", "cloudflare"]
+          "category": [
+            "newsletter"
+          ],
+          "tag": [
+            "newsletter",
+            "cloudflare"
+          ]
         }
       },
       {
@@ -198,15 +431,27 @@
               "_type": "block",
               "style": "normal",
               "children": [
-                { "_type": "span", "text": "Replace this fictional starter issue with your own first newsletter entry after installing the theme." }
+                {
+                  "_type": "span",
+                  "text": "Replace this fictional starter issue with your own first newsletter entry after installing the theme."
+                }
               ]
             }
           ]
         },
-        "bylines": [{ "byline": "author" }],
+        "bylines": [
+          {
+            "byline": "author"
+          }
+        ],
         "taxonomies": {
-          "category": ["newsletter"],
-          "tag": ["newsletter", "ai"]
+          "category": [
+            "newsletter"
+          ],
+          "tag": [
+            "newsletter",
+            "ai"
+          ]
         }
       }
     ]

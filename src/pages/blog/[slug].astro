@@ -1,0 +1,98 @@
+---
+import { decodeSlug, getEmDashEntry, getEntryTerms, getSeoMeta, getSiteSettings } from "emdash";
+import { PortableText } from "emdash/ui";
+import SyleeLayout from "../../layouts/SyleeLayout.astro";
+import { BlueskyComments } from "emdash-plugin-bluesky-comments/astro";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.redirect("/404");
+
+const { entry: post, cacheHint } = await getEmDashEntry("posts", slug);
+if (!post) return Astro.redirect("/404");
+Astro.cache.set(cacheHint);
+
+const [tags, settings] = await Promise.all([
+  getEntryTerms("posts", post.data.id, "tag"),
+  getSiteSettings(),
+]);
+
+const siteTitle = settings.title || "Sy Lee";
+const seo = getSeoMeta(post, {
+  siteTitle,
+  siteUrl: Astro.url.origin,
+  path: `/blog/${slug}`,
+});
+const legacyBlogPostUrl = `https://sylee.dev/blog/${slug}`;
+
+function formatDate(date: Date | null | undefined) {
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+---
+
+<SyleeLayout
+  title={seo.title}
+  pageTitle={seo.ogTitle}
+  description={seo.description}
+  image={seo.ogImage}
+  canonical={seo.canonical}
+  robots={seo.robots}
+  type="article"
+  publishedTime={post.data.publishedAt?.toISOString() ?? null}
+  modifiedTime={post.data.updatedAt.toISOString()}
+  content={{ collection: "posts", id: post.data.id, slug }}
+>
+  <article class="sylee-article" data-pagefind-body>
+    <header>
+      <h1 data-pagefind-meta="title">{post.data.title}</h1>
+      <div class="sylee-article-meta">
+        <time>{formatDate(post.data.publishedAt)}</time>
+        {tags.length > 0 && (
+          <>
+            <span class="sylee-dot">·</span>
+            <div class="sylee-post-tags">
+              {tags.map((tag) => <a href={`/tags/${tag.slug}`}>{tag.label}</a>)}
+            </div>
+          </>
+        )}
+      </div>
+    </header>
+    <div class="sylee-prose">
+      <PortableText value={post.data.content} />
+    </div>
+  </article>
+
+  <BlueskyComments postUrl={legacyBlogPostUrl} />
+
+  <script>
+    function initProgressBar() {
+      const existing = document.getElementById("reading-progress");
+      if (existing) existing.remove();
+      const article = document.querySelector("article");
+      if (!article) return;
+      const bar = document.createElement("div");
+      bar.id = "reading-progress";
+      bar.setAttribute("aria-hidden", "true");
+      Object.assign(bar.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        height: "2px",
+        width: "0%",
+        backgroundColor: "#14b8a6",
+        zIndex: "60",
+        transition: "width 100ms ease-out",
+        pointerEvents: "none",
+      });
+      document.body.appendChild(bar);
+      function updateProgress() {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = docHeight <= 0 ? "100%" : `${Math.min((window.scrollY / docHeight) * 100, 100)}%`;
+      }
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      updateProgress();
+    }
+    initProgressBar();
+    document.addEventListener("astro:after-swap", initProgressBar);
+  </script>
+</SyleeLayout>
