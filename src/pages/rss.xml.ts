@@ -1,30 +1,42 @@
+import type { APIRoute } from "astro";
 import { getEmDashCollection, getSiteSettings } from "emdash";
+import { rssResponse, rssXml } from "../utils/rss";
 
-export async function GET({ site }: { site?: URL }) {
-  const [{ entries }, settings] = await Promise.all([
+export const GET: APIRoute = async ({ site, url }) => {
+  const siteUrl = site?.toString() || url.origin;
+  const settings = await getSiteSettings();
+  const [{ entries: posts }, { entries: issues }] = await Promise.all([
     getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 20 }),
-    getSiteSettings()
+    getEmDashCollection("newsletter", { orderBy: { published_at: "desc" }, limit: 20 }),
   ]);
-  const base = site?.toString().replace(/\/$/, "") || "";
-  const title = settings.title || "Newsletter Notes";
-  const description = settings.tagline || "An independent newsletter about technology, craft, and the web.";
-  const items = entries.map((entry: any) => `
-    <item>
-      <title><![CDATA[${entry.data.title || entry.id}]]></title>
-      <link>${base}/newsletter/${entry.id}</link>
-      <guid>${base}/newsletter/${entry.id}</guid>
-      ${entry.data.publishedAt ? `<pubDate>${entry.data.publishedAt.toUTCString()}</pubDate>` : ""}
-      ${entry.data.excerpt ? `<description><![CDATA[${entry.data.excerpt}]]></description>` : ""}
-    </item>`).join("");
-  return new Response(`<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-  <channel>
-    <title><![CDATA[${title}]]></title>
-    <description><![CDATA[${description}]]></description>
-    <link>${base}/newsletter</link>
-    ${items}
-  </channel>
-</rss>`, {
-    headers: { "Content-Type": "application/rss+xml; charset=utf-8" }
+
+  const items = [
+    ...posts.map((entry: any) => ({
+      title: entry.data.title || entry.id,
+      url: `/blog/${entry.id}`,
+      publishedAt: entry.data.publishedAt as Date | null,
+      excerpt: entry.data.excerpt as string | null,
+    })),
+    ...issues.map((entry: any) => ({
+      title: entry.data.title || entry.id,
+      url: `/newsletter/${entry.id}`,
+      publishedAt: entry.data.publishedAt as Date | null,
+      excerpt: entry.data.excerpt as string | null,
+    })),
+  ].sort((a, b) => {
+    const at = a.publishedAt ? a.publishedAt.getTime() : 0;
+    const bt = b.publishedAt ? b.publishedAt.getTime() : 0;
+    return bt - at;
   });
-}
+
+  return rssResponse(
+    rssXml({
+      title: settings.title || "Site RSS",
+      description: settings.tagline || "Posts and newsletter issues",
+      siteUrl,
+      selfPath: "/rss.xml",
+      channelLink: "/",
+      items,
+    }),
+  );
+};
